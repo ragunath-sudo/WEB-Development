@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOVA EDGE | TASK MANAGER</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background-color: white; }
+.navbar { box-shadow: 1px 1px rgba(0,0,0,0.3); }
+.page { padding-top:70px; min-height:100vh; }
+.card {
+border-radius:20px;
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+footer {
+background:black;
+color:white;
+text-align:center;
+padding:15px;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+<div class="container">
+<span class="navbar-brand fw-bold">
+TASK MANAGEMENT SYSTEM
+</span>
+</div>
+</nav>
+
+<section class="page">
+<div class="container">
+
+<h2 class="text-center mb-4">Manage Your Tasks</h2>
+
+<div class="card p-4 mb-4">
+<form id="taskForm">
+<input type="hidden" id="editIndex">
+
+<div class="row g-3">
+
+<div class="col-md-4">
+<input id="title" class="form-control" placeholder="Task Title" required>
+</div>
+
+<div class="col-md-4">
+<input id="assignedTo" class="form-control" placeholder="Assigned To" required>
+</div>
+
+<div class="col-md-4">
+<input type="date" id="dueDate" class="form-control" required>
+</div>
+
+<div class="col-md-4">
+<select id="priority" class="form-select" required>
+<option value="">Priority</option>
+<option>Low</option>
+<option>Medium</option>
+<option>High</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<select id="status" class="form-select" required>
+<option value="">Status</option>
+<option>Pending</option>
+<option>In Progress</option>
+<option>Completed</option>
+</select>
+</div>
+
+</div>
+
+<div class="text-end mt-3">
+<button class="btn btn-success">Save Task</button>
+</div>
+
+</form>
+</div>
+
+<div class="card p-3">
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+<thead>
+<tr>
+<th>Title</th>
+<th>Assigned To</th>
+<th>Due Date</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="taskTable"></tbody>
+</table>
+</div>
+</div>
+
+</div>
+</section>
+
+<footer>© 2026 NOVA EDGE | Task Manager</footer>
+
+<script>
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+const table = document.getElementById("taskTable");
+
+function renderTable(){
+table.innerHTML="";
+tasks.forEach((t,i)=>{
+table.innerHTML+=`
+<tr>
+<td>${t.title}</td>
+<td>${t.assignedTo}</td>
+<td>${t.dueDate}</td>
+<td>${t.priority}</td>
+<td>${t.status}</td>
+<td>
+<button class="btn btn-sm btn-warning me-1"
+onclick="editTask(${i})">Edit</button>
+<button class="btn btn-sm btn-danger"
+onclick="deleteTask(${i})">Delete</button>
+</td>
+</tr>`;
+});
+localStorage.setItem("tasks",JSON.stringify(tasks));
+}
+
+document.getElementById("taskForm").addEventListener("submit",function(e){
+e.preventDefault();
+
+const data={
+title:document.getElementById("title").value,
+assignedTo:document.getElementById("assignedTo").value,
+dueDate:document.getElementById("dueDate").value,
+priority:document.getElementById("priority").value,
+status:document.getElementById("status").value
+};
+
+const i=document.getElementById("editIndex").value;
+
+if(i===""){
+tasks.push(data);
+}else{
+tasks[i]=data;
+}
+
+document.getElementById("editIndex").value="";
+this.reset();
+renderTable();
+});
+
+function editTask(i){
+const t=tasks[i];
+document.getElementById("title").value=t.title;
+document.getElementById("assignedTo").value=t.assignedTo;
+document.getElementById("dueDate").value=t.dueDate;
+document.getElementById("priority").value=t.priority;
+document.getElementById("status").value=t.status;
+document.getElementById("editIndex").value=i;
+}
+
+function deleteTask(i){
+if(confirm("Delete this task?")){
+tasks.splice(i,1);
+renderTable();
+}
+}
+
+renderTable();
+
+</script>
+
+</body>
+</html>
